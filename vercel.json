@@ -3,20 +3,11 @@
   "outputDirectory": "frontend/dist",
   "framework": null,
   "rewrites": [
-    { "source": "/api/dashboard/stats", "destination": "/api/dashboard/stats" },
-    { "source": "/api/dashboard/upcoming", "destination": "/api/dashboard/upcoming" },
-    { "source": "/api/dashboard/recent-notifications", "destination": "/api/dashboard/recent-notifications" },
-    { "source": "/api/clients/:id/obligations", "destination": "/api/clients/[id]/obligations" },
-    { "source": "/api/clients", "destination": "/api/clients" },
-    { "source": "/api/calendar/import-status", "destination": "/api/calendar/import-status" },
-    { "source": "/api/calendar/obligation-types", "destination": "/api/calendar/obligation-types" },
-    { "source": "/api/calendar/import-mfcr", "destination": "/api/calendar/import-mfcr" },
-    { "source": "/api/calendar/compute-obligations", "destination": "/api/calendar/compute-obligations" },
-    { "source": "/api/calendar", "destination": "/api/calendar" },
-    { "source": "/api/notifications/run-cycle", "destination": "/api/notifications/run-cycle" },
-    { "source": "/api/notifications", "destination": "/api/notifications" },
-    { "source": "/api/rules", "destination": "/api/rules" },
-    { "source": "/api/health", "destination": "/api/health" },
+    { "source": "/api/dashboard/:path*", "destination": "/api/dashboard" },
+    { "source": "/api/clients/:path*", "destination": "/api/clients" },
+    { "source": "/api/calendar/:path*", "destination": "/api/calendar" },
+    { "source": "/api/notifications/:path*", "destination": "/api/notifications" },
+    { "source": "/api/rules/:path*", "destination": "/api/rules" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
