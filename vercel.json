@@ -1,6 +1,7 @@
 {
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
+  "framework": null,
   "rewrites": [
     { "source": "/api/dashboard/stats", "destination": "/api/dashboard/stats" },
     { "source": "/api/dashboard/upcoming", "destination": "/api/dashboard/upcoming" },
@@ -15,6 +16,7 @@
     { "source": "/api/notifications/run-cycle", "destination": "/api/notifications/run-cycle" },
     { "source": "/api/notifications", "destination": "/api/notifications" },
     { "source": "/api/rules", "destination": "/api/rules" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/api/health", "destination": "/api/health" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
