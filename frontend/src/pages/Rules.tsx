@@ -1,67 +1,43 @@
-import { useEffect, useState } from 'react';
-import { api } from '../api';
+import { useState } from 'react';
+import { mappingRules as initialRules } from '../mockData';
 import { Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 
+const typeLabels: Record<string, string> = {
+  dph_mesicni: 'DPH měsíční', dph_ctvrtletni: 'DPH čtvrtletní',
+  kontrolni_hlaseni_mesicni: 'Kontrolní hlášení měs.', kontrolni_hlaseni_ctvrtletni: 'Kontrolní hlášení čtvrt.',
+  dpfo: 'Daň z příjmů FO', dppo: 'Daň z příjmů PO',
+  socialni_osvc: 'Sociální poj. OSVČ', zdravotni_osvc: 'Zdravotní poj. OSVČ',
+  zamestnanci_mesicni: 'Zaměstnanci měsíčně', zamestnanci_rocni: 'Zaměstnanci ročně',
+  silnicni_dan: 'Silniční daň',
+};
+
 export default function Rules() {
-  const [rules, setRules] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rules, setRules] = useState(initialRules);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    subject_type: '',
-    vat_payer: '',
-    vat_frequency: '',
-    has_employees: '',
-    obligation_type: '',
-    description: '',
-  });
+  const [form, setForm] = useState({ subject_type: '', vat_payer: '', vat_frequency: '', has_employees: '', obligation_type: '', description: '' });
 
-  const load = async () => {
-    setLoading(true);
-    const data = await api.getRules();
-    setRules(data);
-    setLoading(false);
+  const toggleRule = (id: number) => {
+    setRules(rules.map(r => r.id === id ? { ...r, is_active: !r.is_active } : r));
   };
 
-  useEffect(() => { load(); }, []);
-
-  const toggleRule = async (rule: any) => {
-    await api.updateRule(rule.id, { is_active: !rule.is_active });
-    load();
+  const deleteRule = (id: number) => {
+    setRules(rules.filter(r => r.id !== id));
   };
 
-  const deleteRule = async (id: number) => {
-    if (!confirm('Opravdu chcete smazat toto pravidlo?')) return;
-    await api.deleteRule(id);
-    load();
-  };
-
-  const addRule = async () => {
-    const data: any = {
-      obligation_type: form.obligation_type,
-      description: form.description || null,
+  const addRule = () => {
+    const newRule = {
+      id: Math.max(...rules.map(r => r.id)) + 1,
       subject_type: form.subject_type || null,
       vat_payer: form.vat_payer === '' ? null : form.vat_payer === 'true',
       vat_frequency: form.vat_frequency || null,
       has_employees: form.has_employees === '' ? null : form.has_employees === 'true',
+      obligation_type: form.obligation_type,
+      description: form.description,
+      is_active: true,
     };
-    await api.createRule(data);
+    setRules([...rules, newRule]);
     setShowForm(false);
     setForm({ subject_type: '', vat_payer: '', vat_frequency: '', has_employees: '', obligation_type: '', description: '' });
-    load();
-  };
-
-  const typeLabels: Record<string, string> = {
-    dph_mesicni: 'DPH měsíční',
-    dph_ctvrtletni: 'DPH čtvrtletní',
-    kontrolni_hlaseni_mesicni: 'Kontrolní hlášení měs.',
-    kontrolni_hlaseni_ctvrtletni: 'Kontrolní hlášení čtvrt.',
-    dpfo: 'Daň z příjmů FO',
-    dppo: 'Daň z příjmů PO',
-    socialni_osvc: 'Sociální poj. OSVČ',
-    zdravotni_osvc: 'Zdravotní poj. OSVČ',
-    zamestnanci_mesicni: 'Zaměstnanci měsíčně',
-    zamestnanci_rocni: 'Zaměstnanci ročně',
-    silnicni_dan: 'Silniční daň',
   };
 
   return (
@@ -83,33 +59,25 @@ export default function Rules() {
             <div>
               <label className="block text-xs text-gray-500 mb-1">Typ subjektu</label>
               <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" value={form.subject_type} onChange={(e) => setForm({ ...form, subject_type: e.target.value })}>
-                <option value="">Libovolný</option>
-                <option value="osvc">OSVČ</option>
-                <option value="sro">s.r.o.</option>
+                <option value="">Libovolný</option><option value="osvc">OSVČ</option><option value="sro">s.r.o.</option>
               </select>
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">Plátce DPH</label>
               <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" value={form.vat_payer} onChange={(e) => setForm({ ...form, vat_payer: e.target.value })}>
-                <option value="">Libovolný</option>
-                <option value="true">Ano</option>
-                <option value="false">Ne</option>
+                <option value="">Libovolný</option><option value="true">Ano</option><option value="false">Ne</option>
               </select>
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">Frekvence DPH</label>
               <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" value={form.vat_frequency} onChange={(e) => setForm({ ...form, vat_frequency: e.target.value })}>
-                <option value="">Libovolná</option>
-                <option value="monthly">Měsíční</option>
-                <option value="quarterly">Čtvrtletní</option>
+                <option value="">Libovolná</option><option value="monthly">Měsíční</option><option value="quarterly">Čtvrtletní</option>
               </select>
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">Má zaměstnance</label>
               <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" value={form.has_employees} onChange={(e) => setForm({ ...form, has_employees: e.target.value })}>
-                <option value="">Libovolný</option>
-                <option value="true">Ano</option>
-                <option value="false">Ne</option>
+                <option value="">Libovolný</option><option value="true">Ano</option><option value="false">Ne</option>
               </select>
             </div>
             <div>
@@ -139,38 +107,30 @@ export default function Rules() {
               <th className="text-left px-4 py-3 font-medium text-gray-500">Typ povinnosti</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">Popis</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">Aktivní</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500"></th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr><td colSpan={8} className="text-center py-8 text-gray-500">Načítání...</td></tr>
-            ) : (
-              rules.map((r) => (
-                <tr key={r.id} className={`border-b border-gray-50 ${!r.is_active ? 'opacity-50' : ''}`}>
-                  <td className="px-4 py-3">{r.subject_type ? (r.subject_type === 'osvc' ? 'OSVČ' : 's.r.o.') : '—'}</td>
-                  <td className="px-4 py-3">{r.vat_payer === null ? '—' : r.vat_payer ? 'Ano' : 'Ne'}</td>
-                  <td className="px-4 py-3">{r.vat_frequency || '—'}</td>
-                  <td className="px-4 py-3">{r.has_employees === null ? '—' : r.has_employees ? 'Ano' : 'Ne'}</td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700">
-                      {typeLabels[r.obligation_type] || r.obligation_type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600 text-xs">{r.description || '—'}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => toggleRule(r)} className="text-gray-500 hover:text-blue-600">
-                      {r.is_active ? <ToggleRight size={20} className="text-green-600" /> : <ToggleLeft size={20} />}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => deleteRule(r.id)} className="text-gray-400 hover:text-red-600">
-                      <Trash2 size={14} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            {rules.map((r) => (
+              <tr key={r.id} className={`border-b border-gray-50 ${!r.is_active ? 'opacity-50' : ''}`}>
+                <td className="px-4 py-3">{r.subject_type ? (r.subject_type === 'osvc' ? 'OSVČ' : 's.r.o.') : '—'}</td>
+                <td className="px-4 py-3">{r.vat_payer === null ? '—' : r.vat_payer ? 'Ano' : 'Ne'}</td>
+                <td className="px-4 py-3">{r.vat_frequency || '—'}</td>
+                <td className="px-4 py-3">{r.has_employees === null ? '—' : r.has_employees ? 'Ano' : 'Ne'}</td>
+                <td className="px-4 py-3">
+                  <span className="inline-flex px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700">{typeLabels[r.obligation_type] || r.obligation_type}</span>
+                </td>
+                <td className="px-4 py-3 text-gray-600 text-xs">{r.description || '—'}</td>
+                <td className="px-4 py-3">
+                  <button onClick={() => toggleRule(r.id)} className="text-gray-500 hover:text-blue-600">
+                    {r.is_active ? <ToggleRight size={20} className="text-green-600" /> : <ToggleLeft size={20} />}
+                  </button>
+                </td>
+                <td className="px-4 py-3">
+                  <button onClick={() => deleteRule(r.id)} className="text-gray-400 hover:text-red-600"><Trash2 size={14} /></button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

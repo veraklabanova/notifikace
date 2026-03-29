@@ -3,11 +3,6 @@
   "outputDirectory": "frontend/dist",
   "framework": null,
   "rewrites": [
-    { "source": "/api/dashboard/:path*", "destination": "/api/dashboard" },
-    { "source": "/api/clients/:path*", "destination": "/api/clients" },
-    { "source": "/api/calendar/:path*", "destination": "/api/calendar" },
-    { "source": "/api/notifications/:path*", "destination": "/api/notifications" },
-    { "source": "/api/rules/:path*", "destination": "/api/rules" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
